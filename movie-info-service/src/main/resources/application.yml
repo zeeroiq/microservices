@@ -1,6 +1,9 @@
 server:
   port: 8081
 
+api:
+  key: 5fa69ff7378a74c89deaa4885f383bc4
+
 spring:
   application:
     name: movie-info-service
