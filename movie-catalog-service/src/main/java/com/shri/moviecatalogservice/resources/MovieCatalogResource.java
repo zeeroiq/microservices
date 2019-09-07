@@ -2,7 +2,6 @@ package com.shri.moviecatalogservice.resources;
 
 import com.shri.moviecatalogservice.models.CatalogItem;
 import com.shri.moviecatalogservice.models.Movie;
-import com.shri.moviecatalogservice.models.Rating;
 import com.shri.moviecatalogservice.models.UserRating;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,11 +27,11 @@ public class MovieCatalogResource {
     @GetMapping("/{userId}")
     public List<CatalogItem> getCatalog(@PathVariable("userId") String userId) {
         // 1. get all rated movies ID
-        UserRating ratings = restTemplate.getForObject("http://localhost:8082/ratingsResources/users/"+ userId, UserRating.class);
+        UserRating ratings = restTemplate.getForObject("http://movie-rate-service/ratingsResources/users/"+ userId, UserRating.class);
 
         return ratings.getUserRating().stream().map(rating -> {
             // 2. for each movie ID, call movie info service and get Details
-            Movie movie = restTemplate.getForObject("http://localhost:8081/movies/" + rating.getMovieId(), Movie.class);
+            Movie movie = restTemplate.getForObject("http://movie-info-service/movies/" + rating.getMovieId(), Movie.class);
             // 3. put them all together
             return new CatalogItem(movie.getName(), "Successor of Infinity War", rating.getRating());
             })
