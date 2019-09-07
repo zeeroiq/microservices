@@ -3,6 +3,7 @@ package com.shri.moviecatalogservice.resources;
 import com.shri.moviecatalogservice.models.CatalogItem;
 import com.shri.moviecatalogservice.models.Movie;
 import com.shri.moviecatalogservice.models.Rating;
+import com.shri.moviecatalogservice.models.UserRating;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,22 +27,16 @@ public class MovieCatalogResource {
     private RestTemplate restTemplate;
 
     @GetMapping("/{userId}")
-    public List<CatalogItem> getCatalog(@PathVariable("userId") String item) {
+    public List<CatalogItem> getCatalog(@PathVariable("userId") String userId) {
         // 1. get all rated movies ID
-        List<Rating> ratings = Arrays.asList(
-                new Rating("1234", 3),
-                new Rating("321", 5)
-        );
+        UserRating ratings = restTemplate.getForObject("http://localhost:8082/ratingsResources/users/"+ userId, UserRating.class);
 
-        return ratings.stream().map(rating -> {
+        return ratings.getUserRating().stream().map(rating -> {
+            // 2. for each movie ID, call movie info service and get Details
             Movie movie = restTemplate.getForObject("http://localhost:8081/movies/" + rating.getMovieId(), Movie.class);
+            // 3. put them all together
             return new CatalogItem(movie.getName(), "Successor of Infinity War", rating.getRating());
-            }).collect(Collectors.toList());
-
-        // 2. for each movie ID, call movie info service and get Details
-        // 3. put them all together
-//        return Collections.singletonList(
-//                new CatalogItem("Endgame", "Successor of Infinity war", 5)
-//        );
+            })
+            .collect(Collectors.toList());
     }
 }

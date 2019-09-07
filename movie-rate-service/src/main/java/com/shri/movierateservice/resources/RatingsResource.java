@@ -1,6 +1,7 @@
 package com.shri.movierateservice.resources;
 
 import com.shri.movierateservice.models.Rating;
+import com.shri.movierateservice.models.UserRating;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,10 +24,13 @@ public class RatingsResource {
     }
 
     @GetMapping("/users/{userId}")
-    public List<Rating> getUserRating(@PathVariable("userId") String userId) {
-        return Arrays.asList(
+    public UserRating getUserRating(@PathVariable("userId") String userId) {
+        List<Rating> ratings = Arrays.asList(
                 new Rating("1234", 3),
                 new Rating("321", 5)
         );
+        UserRating userRating = new UserRating();
+        userRating.setUserRating(ratings);
+        return userRating;
     }
 }
